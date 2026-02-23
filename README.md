@@ -27,6 +27,42 @@ TanStack Start demo for a chat-like virtualized message window with anchor jump.
 - Main panel data always comes from timeline cursor APIs (not filtered sparse matches)
 - So jumping to `m-0555` shows timeline around 555, not disjoint search-only rows
 
+## Logic walkthrough
+
+1) Side panel search
+- Query collection loads filtered candidates (`previewRows`) from `fetchSubsetForCollection`.
+- This list is only for picking an anchor id.
+
+2) Main panel source
+- Main panel uses `useInfiniteQuery` pages from timeline APIs:
+  - initial latest: `fetchByCursor({ cursor: null, direction: 'older' })`
+  - jump around anchor: `fetchAroundWindow({ anchorId, around: 20 })`
+  - top paging: `direction: 'newer'`
+  - bottom paging: `direction: 'older'`
+
+3) Jump behavior
+- Clicking a search result (or pressing Jump) sets `activeAnchor` and increments `searchRun`.
+- Query key changes, so main panel window is replaced with anchor-centered rows.
+
+4) Virtual edge loading
+- `useVirtualizer` tracks visible indexes.
+- If first visible row is near top loader -> fetch newer.
+- If last visible row is near bottom loader -> fetch older.
+
+5) No jump on prepend/append
+- Row heights are measured.
+- After page updates, scroll offset is compensated so viewport stays visually stable.
+
+6) Bounded memory
+- `maxPages` limits cached pages in infinite query.
+- Result: sliding window behavior without keeping all 1000 rows in memory.
+
+## Debugging tip
+
+- In dev mode, check browser console for:
+  - `[virtual-search] final message window`
+- It prints current main-panel ids and whether selected anchor is present.
+
 ## Run locally
 
 ```bash
