@@ -1,0 +1,15 @@
+{
+  "projectName": "trueleap-virtual-search",
+  "typescript": true,
+  "tailwind": true,
+  "packageManager": "pnpm",
+  "mode": "file-router",
+  "addOnOptions": {},
+  "git": true,
+  "version": 1,
+  "framework": "react-cra",
+  "chosenAddOns": [
+    "tanstack-query",
+    "db"
+  ]
+}
